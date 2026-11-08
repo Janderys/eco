@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GRAVITY SHIFT: ECO-ECHO</title>
+<link rel="icon" type="image/png" href="robot (1).png" title="robot iconos">
+<!-- Conexión correcta de CSS (ruta relativa) -->
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div id="app">
+  <header id="hud">
+    <div class="hud-cell">
+      <span class="hud-label" data-i18n="hudLevel"></span>
+      <span class="hud-value"><span id="hud-level">1</span><small id="hud-level-total">/30</small></span>
+    </div>
+    <div class="hud-cell hud-wide" id="cell-integrity">
+      <span class="hud-label" data-i18n="hudIntegrity"></span>
+      <div class="meter-row"><div class="meter"><i id="integrity-fill"></i></div><span class="meter-num" id="hud-integrity">100%</span></div>
+    </div>
+    <div class="hud-cell">
+      <span class="hud-label" data-i18n="hudPoints"></span>
+      <span class="hud-value"><span id="hud-score">000000</span><span class="mult" id="hud-mult">x1.0</span></span>
+    </div>
+    <div class="hud-cell">
+      <span class="hud-label" data-i18n="hudCores"></span>
+      <span class="hud-value" id="hud-cores">0/0</span>
+    </div>
+    <div class="hud-cell hud-wide" id="cell-collapse">
+      <span class="hud-label" data-i18n="hudInstability"></span>
+      <div class="meter-row"><div class="meter"><i id="collapse-fill"></i></div><span class="meter-num" id="hud-collapse">0%</span></div>
+    </div>
+    <div class="hud-cell hud-grav">
+      <span class="hud-label" data-i18n="hudGravity"></span>
+      <div id="gravity-indicator"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22 3 11h6V2h6v9h6z"/></svg></div>
+    </div>
+    <div class="hud-buttons">
+      <button class="icon-btn" id="btn-pause" type="button" data-i18n-label="pauseKey"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg></button>
+      <button class="icon-btn" id="btn-sound" type="button" data-i18n-label="soundKey">
+        <svg class="on" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>
+        <svg class="off" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm18.6 6.2-1.4 1.4-2.7-2.7-2.7 2.7-1.4-1.4 2.7-2.7-2.7-2.7 1.4-1.4 2.7 2.7 2.7-2.7 1.4 1.4-2.7 2.7z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="stage">
+    <canvas id="game" width="800" height="600" aria-label="Gravity Shift"></canvas>
+    <div id="banner"><div class="banner-top" id="banner-top"></div><div class="banner-name" id="banner-name"></div><div class="banner-diff" id="banner-diff"></div></div>
+    <div id="hint" aria-live="polite"></div>
+    <div id="gem-toast"></div>
+
+    <section class="screen active" id="screen-menu">
+      <h1 class="title" id="title" aria-label="Gravity Shift"></h1>
+      <p class="subtitle">ECO-ECHO</p>
+      <p class="pitch" data-i18n="pitch"></p>
+      <div class="actions">
+        <button class="btn primary" type="button" data-action="start" id="btn-play"></button>
+        <button class="btn" type="button" data-action="levels" data-i18n="levels"></button>
+      </div>
+      <div class="actions small">
+        <button class="btn ghost gold" type="button" data-action="shop" data-i18n="shop"></button>
+        <button class="btn ghost" type="button" data-action="settings" data-i18n="settings"></button>
+        <button class="btn ghost" type="button" data-action="howto" data-i18n="howto"></button>
+      </div>
+      <div class="menu-stats"><span class="pill lives" id="menu-lives"></span><span class="pill stars" id="menu-stars"></span><span class="pill" id="menu-score"></span></div>
+      <div class="keys">
+        <span><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> / <kbd>WASD</kbd> <span data-i18n="keyGravity"></span></span>
+        <span><kbd>P</kbd> <span data-i18n="keyPause"></span></span>
+        <span><kbd>R</kbd> <span data-i18n="keyRestart"></span></span>
+        <span><kbd>M</kbd> <span data-i18n="keySound"></span></span>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-levels">
+      <h2 class="h-pause" data-i18n="levels"></h2>
+      <div class="level-grid" id="level-grid"></div>
+      <div class="actions"><button class="btn primary" type="button" data-action="menu" data-i18n="back"></button></div>
+    </section>
+
+    <section class="screen" id="screen-shop">
+      <h2 class="h-pause" data-i18n="shop"></h2>
+      <h3 data-i18n="skinsTitle"></h3>
+      <div class="skin-grid" id="skin-grid"></div>
+      <h3 data-i18n="livesTitle"></h3>
+      <div class="actions small">
+        <button class="btn gold" type="button" data-action="buyRefill" id="btn-refill"></button>
+        <button class="btn gold" type="button" data-action="buyInfinite" id="btn-infinite"></button>
+      </div>
+      <p class="best" data-i18n="shopNote"></p>
+      <div class="actions"><button class="btn primary" type="button" data-action="menu" data-i18n="back"></button></div>
+    </section>
+
+    <section class="screen" id="screen-settings">
+      <h2 class="h-pause" data-i18n="settings"></h2>
+      <div class="settings">
+        <div class="field"><span data-i18n="language"></span><div class="seg" data-set="lang"><button type="button" data-v="es">Español</button><button type="button" data-v="en">English</button></div></div>
+        <div class="field"><span data-i18n="sound"></span><div class="seg" data-set="sound"><button type="button" data-v="1" data-i18n="on"></button><button type="button" data-v="0" data-i18n="off"></button></div></div>
+        <div class="field"><span data-i18n="vibration"></span><div class="seg" data-set="vibration"><button type="button" data-v="1" data-i18n="on"></button><button type="button" data-v="0" data-i18n="off"></button></div></div>
+      </div>
+      <div class="actions"><button class="btn primary" type="button" data-action="menu" data-i18n="back"></button></div>
+    </section>
+
+    <section class="screen" id="screen-howto">
+      <h2 class="h-pause" data-i18n="howto"></h2>
+      <ul class="howto-list">
+        <li><span class="icon icon-grav">✥</span><span data-i18n="how1"></span></li>
+        <li><span class="icon icon-core"></span><span data-i18n="how2"></span></li>
+        <li><span class="icon icon-crystal"></span><span data-i18n="how3"></span></li>
+        <li><span class="icon icon-speed"></span><span data-i18n="how4"></span></li>
+        <li><span class="icon icon-hazard"></span><span data-i18n="how5"></span></li>
+        <li><span class="icon icon-echo"></span><span data-i18n="how6"></span></li>
+      </ul>
+      <div class="actions"><button class="btn primary" type="button" data-action="menu" data-i18n="gotIt"></button></div>
+    </section>
+
+    <section class="screen" id="screen-pause">
+      <h2 class="h-pause" data-i18n="pause"></h2>
+      <p class="lead" id="pause-info"></p>
+      <div class="actions">
+        <button class="btn primary" type="button" data-action="resume" data-i18n="resume"></button>
+        <button class="btn" type="button" data-action="restart" data-i18n="restartLvl"></button>
+        <button class="btn gold" type="button" data-action="guide" data-i18n="guideBtn"></button>
+        <button class="btn" type="button" data-action="menu" data-i18n="menu"></button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-clear">
+      <h2 class="h-clear" data-i18n="levelClear"></h2>
+      <p class="lead" id="clear-name"></p>
+      <div class="stars-big" id="clear-stars"><span>★</span><span>★</span><span>★</span></div>
+      <ul class="criteria" id="clear-crit"></ul>
+      <dl class="stats" id="clear-stats"></dl>
+      <p class="echo-note" id="clear-echo"></p>
+      <div class="actions">
+        <button class="btn primary" type="button" data-action="next" data-i18n="next"></button>
+        <button class="btn" type="button" data-action="replay" data-i18n="replay"></button>
+        <button class="btn" type="button" data-action="menu" data-i18n="menu"></button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-over">
+      <h2 class="h-over" data-i18n="overTitle"></h2>
+      <p class="lead" id="over-cause"></p>
+      <div class="actions">
+        <button class="btn ad" type="button" data-action="revive" data-i18n="revive"></button>
+        <button class="btn primary" type="button" data-action="retry" id="btn-retry"></button>
+      </div>
+      <div class="actions small">
+        <button class="btn gold" type="button" data-action="guide" data-i18n="guideBtn"></button>
+        <button class="btn gold" type="button" data-action="skip" id="btn-skip" data-i18n="skipBtn"></button>
+        <button class="btn" type="button" data-action="menu" data-i18n="menu"></button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-victory">
+      <h2 class="h-victory" data-i18n="victoryTitle"></h2>
+      <p class="lead" data-i18n="victoryText"></p>
+      <dl class="stats" id="victory-stats"></dl>
+      <div class="actions">
+        <button class="btn primary" type="button" data-action="levels" data-i18n="levels"></button>
+        <button class="btn" type="button" data-action="menu" data-i18n="menu"></button>
+      </div>
+    </section>
+  </main>
+</div>
+<!-- Conexión correcta de JS (ruta relativa) -->
+<script src="./game.js"></script>
+</body>
+</html>
